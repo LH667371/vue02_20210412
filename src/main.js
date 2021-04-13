@@ -12,6 +12,7 @@ import "element-ui/lib/theme-chalk/index.css"
 
 Vue.use(Element)
 
+import "../static/js/gt.js"
 // 设置项目的全局样式
 import "../static/css/global.css"
 // 让自定义配置生效

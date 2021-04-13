@@ -6,18 +6,28 @@
                     <router-link to="/"><img src="/static/image/logo.png" alt=""></router-link>
                 </div>
                 <ul class="nav full-left" v-for="(value, index) in header_list" :key="index">
-                    <li v-if="value['is_site']"><a :href="value['link']"><span>{{value['title']}}</span></a></li>
-                    <li v-else><router-link :to="value['link']"><span>{{value['title']}}</span></router-link></li>
+                    <li v-if="value['is_site']"><a :href="value['link']"><span>{{ value['title'] }}</span></a></li>
+                    <li v-else>
+                        <router-link :to="value['link']"><span>{{ value['title'] }}</span></router-link>
+                    </li>
                 </ul>
                 <div class="login-bar full-right">
                     <div class="shop-cart full-left">
-                        <img src="/static/image/cart.svg" alt="">
+                        <img src="/static/image/cart.png" alt="">
                         <span><router-link to="/cart">购物车</router-link></span>
                     </div>
-                    <div class="login-box full-left">
-                        <span>登录</span>
+                    <div class="login-box full-left" v-show="!login_status">
+                        <span><router-link to="/login">登录</router-link></span>
                         &nbsp;|&nbsp;
                         <span>注册</span>
+                    </div>
+                    <div class="login-box full-left" v-show="login_status">
+                        欢迎
+                        <el-link type="primary">{{ username }}</el-link>
+                        登录！&nbsp;
+                        <el-popconfirm title="确定退出登录吗？" @confirm="log_off">
+                            <span slot="reference">退出登录</span>
+                        </el-popconfirm>
                     </div>
                 </div>
             </div>
@@ -31,10 +41,16 @@ export default {
     data() {
         return {
             header_list: [],
+            username: '',
+            login_status: false,
         }
     },
     created() {
         this.get_header_list();
+        if (sessionStorage.token) {
+            this.login_status = true;
+            this.username = sessionStorage.username;
+        }
     },
     methods: {
         get_header_list() {
@@ -46,6 +62,10 @@ export default {
             }).catch(error => {
                 console.log(error);
             })
+        },
+        log_off() {
+            this.login_status = false;
+            sessionStorage.clear();
         }
     }
 }
@@ -53,7 +73,7 @@ export default {
 
 <style scoped>
 .header-box {
-    height: 20px;
+    height: 80px;
 }
 
 .header {
@@ -126,10 +146,10 @@ export default {
     background: #f7f7f7;
     cursor: pointer;
     font-size: 14px;
-    height: 28px;
+    height: 30px;
     width: 100px;
     margin-top: 30px;
-    line-height: 32px;
+    line-height: 30px;
     text-align: center;
 }
 
