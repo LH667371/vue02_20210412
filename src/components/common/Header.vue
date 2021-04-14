@@ -13,21 +13,24 @@
                 </ul>
                 <div class="login-bar full-right">
                     <div class="shop-cart full-left">
-                        <img src="/static/image/cart.png" alt="">
+                        <img src="/static/image/cart.svg" alt="">
                         <span><router-link to="/cart">购物车</router-link></span>
                     </div>
                     <div class="login-box full-left" v-show="!login_status">
                         <span><router-link to="/login">登录</router-link></span>
                         &nbsp;|&nbsp;
-                        <span>注册</span>
+                        <span><router-link to="/register">注册</router-link></span>
                     </div>
                     <div class="login-box full-left" v-show="login_status">
                         欢迎
                         <el-link type="primary">{{ username }}</el-link>
-                        登录！&nbsp;
+                        登录！
+                        <span>我的订单</span>
+                        &nbsp;|&nbsp;
                         <el-popconfirm title="确定退出登录吗？" @confirm="log_off">
                             <span slot="reference">退出登录</span>
                         </el-popconfirm>
+
                     </div>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 <template>
     <el-carousel height="710px" :interval="3000" arrow="always">
         <el-carousel-item v-for="(value, index) in banner_list" :key="index">
-            <a :href="value['link']"><img :src="value['image_url']" alt=""></a>
+            <a :href="value['link']"><img class="img1" :src="value['image_url']" width="100%" alt=""></a>
         </el-carousel-item>
     </el-carousel>
 </template>
@@ -34,6 +34,14 @@ export default {
 </script>
 
 <style scoped>
+.img1 {
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    margin:auto;
+}
 .el-carousel__item h3 {
     color: #475669;
     font-size: 18px;
@@ -42,11 +50,12 @@ export default {
     margin: 0;
 }
 
-.el-carousel__item:nth-child(2n) {
-    background-color: #99a9bf;
-}
+/*.el-carousel__item:nth-child(2n) {*/
+/*    background-color: #99a9bf;*/
+/*}*/
 
-.el-carousel__item:nth-child(2n+1) {
-    background-color: #d3dce6;
+.el-carousel__item:nth-child(n) {
+    /*background-color: #d3dce6;*/
+    background-color: #25292e;
 }
 </style>
