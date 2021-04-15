@@ -43,7 +43,8 @@
                 </div>
             </div>
         </div>
-        <el-dialog title="找回密码" :visible.sync="forgetPassword" width="25%" :close-on-click-modal="false" @close="reset_data" center>
+        <el-dialog title="找回密码" :visible.sync="forgetPassword" width="25%" :close-on-click-modal="false"
+                   @close="reset_data" center>
             <div v-show="!check" align="center">
                 <el-input style="margin-top: 10px;" placeholder="手机号码"
                           v-model="phone"></el-input>
@@ -56,10 +57,20 @@
 
             </div>
             <div v-show="check" align="center">
-                <el-input style="margin-top: 10px;" placeholder="密码" v-model="c_password"
-                          show-password></el-input>
-                <el-input style="margin-top: 20px;" placeholder="再次输入密码"
-                          v-model="re_password" show-password></el-input>
+                <el-popover placement="right" title="密码输入要求" :width="200" trigger="hover"
+                            content="数字、英文、字符中的两种及以上，长度为6-20。">
+                    <template #reference>
+                        <el-input style="margin-top: 10px;" placeholder="密码" v-model="c_password"
+                                  show-password></el-input>
+                    </template>
+                </el-popover>
+                <el-popover placement="right" title="密码输入要求" :width="200" trigger="hover"
+                            content="数字、英文、字符中的两种及以上，长度为6-20。">
+                    <template #reference>
+                        <el-input style="margin-top: 20px;" placeholder="再次输入密码" v-model="re_password"
+                                  show-password></el-input>
+                    </template>
+                </el-popover>
             </div>
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" v-show="!check" @click="enter_change">确 定</el-button>
@@ -309,7 +320,20 @@ export default {
             }, 1000)
         },
         enter_change() {
-            if (!/\d{4,6}/.test(this.code))
+            if (!/^1([358][0-9]|4[01456879]|6[2567]|7[0-8]|9[0-3,5-9])\d{8}$/.test(this.phone)) {
+                if (this.phone)
+                    this.$message({
+                        showClose: true,
+                        message: '手机号格式有误，请重新输入！',
+                        type: 'error',
+                    });
+                else
+                    this.$message({
+                        showClose: true,
+                        message: '手机号为空，请输入！',
+                        type: 'error',
+                    });
+            } else if (!/\d{4,6}/.test(this.code))
                 if (this.code)
                     this.$message({
                         showClose: true,
@@ -419,7 +443,7 @@ export default {
                         });
                 })
         },
-        reset_data(){
+        reset_data() {
             this.phone = '';
             this.token_change = '';
             this.c_password = '';
