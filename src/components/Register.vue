@@ -84,9 +84,9 @@ export default {
                         status: 'register',
                     }
                 }).then(res => {
-                    console.log(res.data.message);
-                    if (res.data.message)
-                        this.$confirm(res.data.message, '提示', {
+                    // console.log(res.data.message);
+                    if (res.data['message1'])
+                        this.$confirm(res.data['message1'], '提示', {
                             confirmButtonText: '确定',
                             cancelButtonText: '取消',
                             type: 'success'
