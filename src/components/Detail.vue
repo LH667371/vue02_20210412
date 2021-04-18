@@ -52,7 +52,7 @@
                             (试学)
                         </span>
                     </li>
-                    <li :class="tabIndex===3?'active':''" @click="tabIndex=3">
+                    <li :class="tabIndex===3?'active':''" @click="tabIndex=3;get_comment">
                         学生评论 ({{ comment.length }})
                     </li>
                     <li :class="tabIndex===4?'active':''" @click="tabIndex=4">常见问题</li>
@@ -265,6 +265,7 @@ export default {
             // console.log(this.comment);
         },
         del_comment(id, index) {
+            this.username = sessionStorage.username ? sessionStorage.username : '';
             if (sessionStorage.username !== undefined) {
                 this.$axios({
                     url: this.$settings.HOST + 'course/comment/',
@@ -284,10 +285,13 @@ export default {
                     console.log(error);
                 })
             } else {
-                this.username = '';
+                this.$message({
+                    showClose: true,
+                    message: '请先登录！',
+                    type: 'error',
+                });
             }
-        }
-        ,
+        },
         show_date(date) {
             let obj = new Date();
             if (date.search(obj.getFullYear()) !== -1)
