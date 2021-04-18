@@ -13,7 +13,7 @@ export default new Router({
         {path: "/home", component: Home},
         {path: "/login", component: Login},
         {path: "/register", component: Register},
-        {path: "/course", component: Course},
+        {path: "/course/:category", component: Course},
         {path: "/detail/:id", component: Detail},
         {path: "/", redirect: "/home"},
         {path: "/*", redirect: "/home"},

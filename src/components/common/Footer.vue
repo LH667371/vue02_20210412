@@ -2,7 +2,7 @@
     <div class="footer">
         <ul>
             <li v-for="(value, index) in footer_list" :key="index">
-                <a :href="value['link']" v-if="value['is_site']">{{ value['title'] }}</a>
+                <a :href="value['link']" v-if="value['is_site']" target="_blank" >{{ value['title'] }}</a>
                 <router-link v-else :to="value['link']">{{ value['title'] }}</router-link>
             </li>
         </ul>

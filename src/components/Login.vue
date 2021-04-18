@@ -109,6 +109,7 @@ export default {
             this.password = localStorage.password;
             this.remember = true;
         }
+        console.log(this.$route);
         if (sessionStorage.token) {
             this.$router.push('/');
         }
@@ -194,7 +195,7 @@ export default {
                     localStorage.removeItem('username');
                     localStorage.removeItem('password');
                 }
-                this.$router.push('/');
+                this.$router.go(-1);
             }).catch(error => {
                 console.log(error);
                 this.$message({
@@ -234,7 +235,7 @@ export default {
                     sessionStorage.token = res.data.token;
                     sessionStorage.username = res.data.username;
                     sessionStorage.user_id = res.data.user_id;
-                    this.$router.push('/');
+                    this.$router.go(-1);;
                 }).catch(error => {
                     if (error.response.data.message)
                         this.$message({

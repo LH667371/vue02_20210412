@@ -44,25 +44,27 @@
                         </h3>
                         <p class="teather-info">{{ course.teacher !== null ? course.teacher.name : '' }}
                             {{ course.teacher !== null ? course.teacher.title : '' }}
-                            <span>共{{
-                                    course.lessons
-                                }}课时/{{
-                                    course.lessons === course.pub_lessons ? '更新完成' : `已更新${course.pub_lessons}课时`
-                                }}</span>
+                            <span>
+                                {{ course.lessons === course.pub_lessons ? '更新完成' : `已更新${course.pub_lessons}课时` }}
+                                /共{{ course.lessons }}课时
+                            </span>
                         </p>
-                        <ul class="lesson-list">
-                            <li v-for="(lesson, index) in course.lesson_list" :key="index">
-                                <span class="lesson-title">0{{ lesson.chapter }} | 第{{ lesson.orders }}节：{{
-                                        lesson.name
-                                    }}</span>
-                                <span v-if="lesson.free_trail" class="free">免费</span>
-                            </li>
-                        </ul>
+                        <div style="height: 114px">
+                            <ul class="lesson-list">
+                                <li v-for="(lesson, index) in course.lesson_list" :key="index">
+                                <span class="lesson-title">
+                                    0{{ lesson.chapter }} | 第{{ lesson.orders }}节：
+                                    {{ lesson.name }}
+                                </span>
+                                    <span v-if="lesson.free_trail" class="free">免费</span>
+                                </li>
+                            </ul>
+                        </div>
                         <div class="pay-box">
                             <span class="discount-type" v-show="course.course_type === 3">限时免费</span>
                             <span class="discount-price" v-show="course.course_type === 3">￥0.00元</span>
                             <span class="original-price" v-show="course.course_type === 3">原价：{{ course.price }}元</span>
-                            <span class="discount-price" v-show="course.course_type !== 3">价格：{{ course.price }}元</span>
+                            <span class="discount-price" v-show="course.course_type !== 3">￥{{ course.price }}元</span>
                             <span class="buy-now">立即购买</span>
                         </div>
                     </div>
@@ -108,11 +110,34 @@ export default {
             }
         }
     },
+    created() {
+        if (this.$route.params)
+            this.category = this.$route.params.category;
+        this.get_category_list();
+        this.get_course_list();
+    },
+    updated() {
+        if (document.getElementsByTagName('li')[parseInt(this.category) + 6] && this.category_list[parseInt(this.category) - 1])
+            if (document.getElementsByTagName('li')[parseInt(this.category) + 6].innerText === this.category_list[parseInt(this.category) - 1].name)
+                document.getElementsByTagName('li')[parseInt(this.category) + 6].className = 'this';
+        if (this.category === '0' && document.getElementsByTagName('li')[parseInt(this.category) + 6].innerText === '全部')
+            document.getElementsByTagName('li')[parseInt(this.category) + 6].className = 'this';
+
+    },
     watch: {
         // 当分类id的值变化时，根据当前点击分类重新获取对应课程
         category() {
             this.filters.page = 1;
             this.get_course_list();
+            this.$router.push('/course/' + String(this.category)).catch(err => {
+                console.log();
+            });
+        },
+        '$route'(val, OldVal) {
+            if (this.$route.params)
+                this.category = this.$route.params.category;
+            document.getElementsByTagName('li')[parseInt(val.params.category) + 6].className = 'this';
+            document.getElementsByTagName('li')[parseInt(OldVal.params.category) + 6].className = '';
         },
     },
     methods: {
@@ -149,7 +174,6 @@ export default {
             } else {
                 filters.ordering = this.filters.type;
             }
-
             this.$axios.get(this.$settings.HOST + "course/list/", {
                 params: filters
             }).then(res => {
@@ -186,18 +210,12 @@ export default {
             } else if (this.filters.type === type && this.filters.orders === "asc") {
                 this.filters.orders = "desc";
             }
-
             //更改排序类型
             this.filters.type = type;
             // 点击排序后重新获取排序后的课程
             this.get_course_list();
-
         },
     },
-    created() {
-        this.get_category_list();
-        this.get_course_list();
-    }
 }
 </script>
 
@@ -413,7 +431,7 @@ export default {
 .course .course-item .course-image {
     float: left;
     width: 423px;
-    height: 245px;
+    height: 243px;
     margin-right: 30px;
 }
 
@@ -450,6 +468,7 @@ export default {
 .course-item .course-info .teather-info {
     font-size: 14px;
     color: #9b9b9b;
+    height: 15px;
     margin-bottom: 14px;
     padding-bottom: 14px;
     border-bottom: 1px solid #333;
@@ -493,7 +512,7 @@ export default {
 
 .course-item .lesson-list li .free {
     width: 34px;
-    height: 18px;
+    height: 15px;
     color: #fd7b4d;
     vertical-align: super;
     margin-right: 10px;

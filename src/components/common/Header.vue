@@ -6,7 +6,7 @@
                     <router-link to="/"><img src="/static/image/logo.png" alt=""></router-link>
                 </div>
                 <ul class="nav full-left" v-for="(value, index) in header_list" :key="index">
-                    <li v-if="value['is_site']"><a :href="value['link']"><span>{{ value['title'] }}</span></a></li>
+                    <li v-if="value['is_site']"><a :href="value['link']" target="_blank" ><span>{{ value['title'] }}</span></a></li>
                     <li v-else>
                         <router-link :to="value['link']"><span>{{ value['title'] }}</span></router-link>
                     </li>
@@ -67,10 +67,11 @@ export default {
             })
         },
         log_off() {
+            this.username='';
             this.login_status = false;
             sessionStorage.clear();
-        }
-    }
+        },
+    },
 }
 </script>
 
