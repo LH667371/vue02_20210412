@@ -6,15 +6,20 @@
                     <router-link to="/"><img src="/static/image/logo.png" alt=""></router-link>
                 </div>
                 <ul class="nav full-left" v-for="(value, index) in header_list" :key="index">
-                    <li v-if="value['is_site']"><a :href="value['link']" target="_blank" ><span>{{ value['title'] }}</span></a></li>
+                    <li v-if="value['is_site']"><a :href="value['link']" target="_blank"><span>{{
+                            value['title']
+                        }}</span></a></li>
                     <li v-else>
                         <router-link :to="value['link']"><span>{{ value['title'] }}</span></router-link>
                     </li>
                 </ul>
                 <div class="login-bar full-right">
                     <div class="shop-cart full-left">
-                        <img src="/static/image/cart.svg" alt="">
-                        <span><router-link to="/cart">购物车</router-link></span>
+                        <span @click="to_cart">
+                                <img src="/static/image/cart.svg" alt="">
+                                <span style="color: blue">{{ $store.state.cart_length }}</span>
+                                购物车
+                        </span>
                     </div>
                     <div class="login-box full-left" v-show="!login_status">
                         <span><router-link to="/login">登录</router-link></span>
@@ -56,6 +61,15 @@ export default {
         }
     },
     methods: {
+        to_cart() {
+            if (!sessionStorage.token) {
+                this.$confirm("请登录后再查看购物车，点击确认可前往登录！").then(() => {
+                    this.$router.push('/login');
+                })
+                return false;
+            } else
+                this.$router.push('/cart');
+        },
         get_header_list() {
             this.$axios({
                 url: this.$settings.HOST + 'home/header/',
@@ -68,7 +82,10 @@ export default {
         },
         log_off() {
             this.$store.commit('change_username', '');
+            this.$store.commit('change_count', '');
             this.login_status = false;
+            if (this.$route.fullPath === '/cart')
+                this.$router.push('/');
             sessionStorage.clear();
         },
     },

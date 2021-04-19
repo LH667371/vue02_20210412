@@ -34,7 +34,7 @@
                             <button class="buy-now">立即购买</button>
                             <button class="free">免费试学</button>
                         </div>
-                        <div class="add-cart">
+                        <div class="add-cart" @click="add_cart">
                             <!--                            <img src="" alt="">-->
                             加入购物车
                         </div>
@@ -151,7 +151,9 @@
                 </div>
             </div>
         </div>
-        <Footer/>
+        <div class="footer">
+            <Footer/>
+        </div>
     </div>
 </template>
 
@@ -300,12 +302,47 @@ export default {
                 return formatDate({date: date, formatStr: 'MM-dd HH:mm:ss'})
             else
                 return formatDate({date: date, formatStr: 'yyyy-MM-dd HH:mm:ss'})
-        }
+        },
+        // 用户在操作购物车时必须已经登录
+        check_user_login() {
+            if (!sessionStorage.token) {
+                this.$confirm("请登录后再添加购物车，点击确认可前往登录！").then(() => {
+                    this.$router.push('/login');
+                })
+                return false;
+            }
+        },
+        // 向后端发请求添加购物车
+        add_cart() {
+            // 添加购物车时必须已经登录
+            this.check_user_login();
+            this.$axios.post(this.$settings.HOST + "cart/option/", {
+                course_id: this.$route.params.id
+            }, {
+                headers: {
+                    // 由于此视图需要认证，所以需要携带token
+                    "Authorization": "auth " + sessionStorage.token
+                },
+            }).then(res => {
+                this.$message.success(res.data.message);
+                // 当添加购物车时，向状态机提交一个动作修改购物车数量
+                this.$store.commit("change_count", res.data.cart_length);
+            }).catch(error => {
+                console.log(error);
+            })
+        },
     }
 }
 </script>
 
 <style scoped>
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 147px;
+}
+
 .main {
     background: #fff;
     padding-top: 30px;

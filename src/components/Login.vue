@@ -102,19 +102,18 @@ export default {
             check: false,
             token_change: '',
         }
-    }
-    , created() {
+    },
+    created() {
         if (localStorage.username) {
             this.username = localStorage.username;
             this.password = localStorage.password;
             this.remember = true;
         }
-        console.log(this.$route);
         if (sessionStorage.token) {
             this.$router.push('/');
         }
-    }
-    , methods: {
+    },
+    methods: {
         // 点击登录按钮  获取验证码
         get_captcha() {
             if (this.username === '' || this.password === '')

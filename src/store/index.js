@@ -7,8 +7,9 @@ Vue.use(Vuex)
 export default new Vuex.Store({
     state: {
         // 购物车课程数量
-        cart_length: 0,
+        cart_length: '',
         username: '',
+        select_id: [],
     },
     mutations: {
         // 监测购物车的动作
@@ -17,6 +18,16 @@ export default new Vuex.Store({
         },
         change_username(state, name) {
             state.username = name;
+        },
+        add_select(state, id) {
+            state.select_id.push(id);
+        },
+        del_select(state, id) {
+            state.select_id.splice(id, 1);
+        },
+        all_del_select(state, check) {
+            if (check)
+                state.select_id = [];
         }
     }
 })
