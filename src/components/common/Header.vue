@@ -67,7 +67,7 @@ export default {
             })
         },
         log_off() {
-            this.username='';
+            this.$store.commit('change_username', '');
             this.login_status = false;
             sessionStorage.clear();
         },

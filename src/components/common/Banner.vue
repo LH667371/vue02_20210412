@@ -1,7 +1,7 @@
 <template>
     <el-carousel height="710px" :interval="3000" arrow="always">
         <el-carousel-item v-for="(value, index) in banner_list" :key="index">
-            <a :href="value['link']"><img class="img1" :src="value['image_url']" width="100%" alt=""></a>
+            <router-link :to="value['link']"><img class="img1" :src="value['image_url']" width="100%" alt=""></router-link>
         </el-carousel-item>
     </el-carousel>
 </template>

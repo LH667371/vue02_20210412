@@ -188,6 +188,7 @@ export default {
                 sessionStorage.token = res.data.token;
                 sessionStorage.username = res.data.username;
                 sessionStorage.user_id = res.data.user_id;
+                this.$store.commit('change_username', res.data.username);
                 if (this.remember) {
                     localStorage.username = this.username;
                     localStorage.password = this.password;
@@ -235,7 +236,8 @@ export default {
                     sessionStorage.token = res.data.token;
                     sessionStorage.username = res.data.username;
                     sessionStorage.user_id = res.data.user_id;
-                    this.$router.go(-1);;
+                    this.$store.commit('change_username', res.data.username);
+                    this.$router.go(-1);
                 }).catch(error => {
                     if (error.response.data.message)
                         this.$message({

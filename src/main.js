@@ -28,11 +28,13 @@ import 'vue-video-player/src/custom-theme.css'
 import 'video.js/dist/video-js.css'
 
 Vue.use(VideoPlayer)
+import store from "./store/index"
 
 /* eslint-disable no-new */
 new Vue({
     el: '#app',
     router,
+    store,
     components: {App},
     template: '<App/>'
 })

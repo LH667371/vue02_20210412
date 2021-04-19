@@ -114,7 +114,7 @@
                                 <div>
                                     <span style="padding-left: 3%">{{ value.text }}</span>
                                     <!--                                    {{sessionStorage.username}}-->
-                                    <span v-show="value.username === username">
+                                    <span v-show="value.username === $store.state.username">
                                     <el-popconfirm title="确定要删除这条信息吗？" @confirm="del_comment(value.id, index)"
                                                    icon="el-icon-info"
                                                    icon-color="red">
@@ -159,7 +159,7 @@
 import Header from "./common/Header";
 import Footer from "./common/Footer";
 import {videoPlayer} from "vue-video-player";
-import {formatDate} from './common/date.js';
+import {formatDate} from '../utils/date.js';
 
 export default {
     name: "Detail",
@@ -170,7 +170,6 @@ export default {
     },
     data() {
         return {
-            username: '',
             tabIndex: 2,
             course_info: {},
             playerOptions: {
@@ -198,8 +197,6 @@ export default {
         // console.log(this.$route.params.id);
         this.get_course_info();
         this.get_comment();
-        this.username = sessionStorage.username ? sessionStorage.username : '';
-        console.log(this.$children);
     },
     methods: {
         get_course_info() {
@@ -219,7 +216,7 @@ export default {
         },
         get_comment() {
             this.$axios({
-                url: this.$settings.HOST + 'course/comment/',
+                url: this.$settings.HOST + 'course/get_comment/',
                 method: 'get',
                 params: {
                     course: this.$route.params.id,
@@ -240,15 +237,18 @@ export default {
                         data: {
                             course: this.$route.params.id,
                             text: this.textarea,
-                            user: sessionStorage.user_id
-                        }
+                            user: sessionStorage.user_id,
+                        },
+                        headers: {
+                            'Authorization': 'auth ' + sessionStorage.token
+                        },
                     }).then(res => {
                         this.$message({
                             showClose: true,
                             message: '评论成功！',
                             type: 'success',
                         });
-                        this.comment.push(res.data);
+                        this.comment.unshift(res.data);
                     }).catch(error => {
                         console.log(error);
                     })
@@ -265,7 +265,6 @@ export default {
             // console.log(this.comment);
         },
         del_comment(id, index) {
-            this.username = sessionStorage.username ? sessionStorage.username : '';
             if (sessionStorage.username !== undefined) {
                 this.$axios({
                     url: this.$settings.HOST + 'course/comment/',
@@ -273,7 +272,10 @@ export default {
                     data: {
                         course: this.$route.params.id,
                         id: id,
-                    }
+                    },
+                    headers: {
+                        'Authorization': 'auth ' + sessionStorage.token
+                    },
                 }).then(res => {
                     this.$message({
                         showClose: true,
