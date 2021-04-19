@@ -1,6 +1,7 @@
 import Vue from "vue"
 
 import Vuex from "vuex"
+import da from "element-ui/src/locale/lang/da";
 
 Vue.use(Vuex)
 
@@ -10,6 +11,7 @@ export default new Vuex.Store({
         cart_length: '',
         username: '',
         select_id: [],
+        cart_list: [],
     },
     mutations: {
         // 监测购物车的动作
@@ -28,6 +30,9 @@ export default new Vuex.Store({
         all_del_select(state, check) {
             if (check)
                 state.select_id = [];
+        },
+        give_cart_list(state, data) {
+            state.cart_list = data;
         }
     }
 })

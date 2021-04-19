@@ -30,7 +30,7 @@ export default {
                 },
             }).then(res => {
                 console.log(res.data);
-                this.$store.commit("change_count", res.data.length);
+                this.$store.commit("change_count", res.data.length === 0 ? '' : res.data.length);
             }).catch(error => {
                 console.log(error);
             })

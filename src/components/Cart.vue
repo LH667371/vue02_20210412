@@ -14,7 +14,7 @@
                     <span class="price_row">单价</span>
                     <span class="do_more">操作</span>
                 </div>
-                <div class="cart_course_list" v-for="(course, index) in cart_list" :key="index">
+                <div class="cart_course_list" v-for="(course, index) in this.$store.state.cart_list" :key="index">
                     <CartItem :course="course"></CartItem>
                     <hr>
                 </div>
@@ -26,7 +26,12 @@
                         </label>
                     </span>
                     <span class="cart_delete">
-                        <i class="el-icon-delete"> 删除</i>
+                        <el-popconfirm icon="el-icon-info"
+                                       icon-color="red"
+                                       :title="'确定删除勾选的吗？'"
+                                       @confirm="del_course">
+                            <span slot="reference"><i class="el-icon-delete"> 删除</i></span>
+                        </el-popconfirm>
                     </span>
                     <span class="goto_pay">去结算</span>
                     <span class="cart_total">总计：¥0.0</span>
@@ -54,13 +59,12 @@ export default {
     data() {
         return {
             token: "",
-            cart_list: [],
             checked: false,
         }
     },
     watch: {
         "$store.state.select_id"() {
-            this.checked = this.$store.state.select_id.length === this.cart_list.length;
+            this.checked = this.$store.state.select_id.length !== 0 ? this.$store.state.select_id.length === this.$store.state.cart_list.length : false;
         }
     },
     methods: {
@@ -72,12 +76,12 @@ export default {
                 }
             }).then(res => {
                 // console.log(res);
-                this.$store.commit("change_count", res.data.length);
-                this.cart_list = res.data;
+                this.$store.commit("change_count", res.data.length === 0 ? '' : res.data.length);
+                this.$store.commit('give_cart_list', res.data);
                 for (let i = 0; i < res.data.length; i++)
                     if (res.data[i].selected)
                         this.$store.commit('add_select', res.data[i].course_id)
-                this.checked = this.$store.state.select_id.length === res.data.length;
+                this.checked = this.$store.state.select_id.length !== 0 ? this.$store.state.select_id.length === res.data.length : false;
             }).catch(error => {
                 console.log(error);
                 if (error.response.data.detail === "Signature has expired.")
@@ -101,9 +105,9 @@ export default {
         // 发起请求修改redis中的选中状态
         change_all_select() {
             let course_id = [];
-            if (this.cart_list) {
-                for (let i = 0; i < this.cart_list.length; i++)
-                    course_id.push(this.cart_list[i].course_id);
+            if (this.$store.state.cart_list) {
+                for (let i = 0; i < this.$store.state.cart_list.length; i++)
+                    course_id.push(this.$store.state.cart_list[i].course_id);
             }
             this.$axios.put(this.$settings.HOST + "cart/option/", {
                 course_id: course_id,
@@ -117,19 +121,74 @@ export default {
                 if (this.checked) {
                     this.$message('全部勾选 ');
                     this.$store.commit('all_del_select', true);
-                    for (let i = 0; i < this.cart_list.length; i++)
-                        if (this.cart_list[i].selected)
-                            this.$store.commit('add_select', this.cart_list[i].course_id);
+                    for (let i = 0; i < this.$store.state.cart_list.length; i++)
+                        if (this.$store.state.cart_list[i].selected)
+                            this.$store.commit('add_select', this.$store.state.cart_list[i].course_id);
                 } else {
                     this.$message('取消全部 ');
                     this.$store.commit('all_del_select', true);
                 }
             }).catch(error => {
                 console.log(error);
+                if (error.response.data.detail === "Signature has expired.")
+                    this.$confirm("登录已过期，请重新登录，点击确认可前往登录！").then(() => {
+                        this.$store.commit('change_username', '');
+                        this.$store.commit('change_count', '');
+                        sessionStorage.clear();
+                        this.$router.push('/login');
+                    })
             })
+        },
+        del_course() {
+            let course_id = this.$store.state.select_id;
+            this.$store.commit('all_del_select', true);
+            if (course_id.length > 0)
+                this.$axios({
+                    url: this.$settings.HOST + "cart/option/",
+                    method: 'delete',
+                    data: {
+                        course_id: course_id,
+                    },
+                    headers: {
+                        "Authorization": "auth " + sessionStorage.token
+                    }
+                }).then(res => {
+                    // console.log(res);
+                    this.$store.commit('change_count', this.$store.state.cart_length - course_id.length > 0 ? this.$store.state.cart_length - course_id.length : '');
+                    for (let i = 0; i < this.$store.state.cart_list.length; i++)
+                        for (let j = 0; j < course_id.length; j++) {
+                            if (this.$store.state.cart_list[i].course_id === course_id[j]) {
+                                this.$store.state.cart_list.splice(i, 1);
+                            }
+                        }
+                    this.$message({
+                        message: '已删除!',
+                        type: "success"
+                    });
+                }).catch(error => {
+                    console.log(error);
+                    if (error.response.data.detail === "Signature has expired.")
+                        this.$confirm("登录已过期，请重新登录，点击确认可前往登录！").then(() => {
+                            this.$store.commit('change_username', '');
+                            this.$store.commit('change_count', '');
+                            sessionStorage.clear();
+                            this.$router.push('/login');
+                        })
+                    else
+                        this.$message({
+                            message: '删除失败!',
+                            type: "error"
+                        });
+                })
+            else
+                this.$message({
+                    message: '需要您进行勾选需要删除的商品!',
+                    type: "error"
+                });
         },
     },
     created() {
+        this.$store.commit('give_cart_list', []);
         this.$store.commit('all_del_select', true);
         this.check_user_login();
         this.get_cart_list();
@@ -250,6 +309,7 @@ export default {
 }
 
 .cart_footer_row .cart_delete i:hover {
+    cursor: default;
     color: #ffc210;
 }
 

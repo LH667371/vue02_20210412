@@ -16,7 +16,14 @@
             </el-select>
         </div>
         <div class="cart_column column_4">¥{{ course.price }}</div>
-        <div class="cart_column column_4">删除</div>
+        <div class="cart_column column_4">
+            <el-popconfirm icon="el-icon-info"
+                           icon-color="red"
+                           :title="'确定删除 '+this.course.name+' 吗？'"
+                           @confirm="del_course">
+                <span slot="reference">删除</span>
+            </el-popconfirm>
+        </div>
     </div>
 </template>
 
@@ -55,7 +62,50 @@ export default {
                     this.$store.commit('del_select', this.$store.state.select_id.indexOf(this.course.course_id))
                 }
             }).catch(error => {
+                if (error.response.data.detail === "Signature has expired.")
+                    this.$confirm("登录已过期，请重新登录，点击确认可前往登录！").then(() => {
+                        this.$store.commit('change_username', '');
+                        this.$store.commit('change_count', '');
+                        sessionStorage.clear();
+                        this.$router.push('/login');
+                    })
                 console.log(error);
+            })
+        },
+        del_course() {
+            let course_id = [];
+            course_id.push(this.course.course_id);
+            this.$axios({
+                url: this.$settings.HOST + "cart/option/",
+                method: 'delete',
+                data: {
+                    course_id: course_id,
+                },
+                headers: {
+                    "Authorization": "auth " + sessionStorage.token
+                }
+            }).then(res => {
+                // console.log(res);
+                this.$store.commit('change_count', this.$store.state.cart_length !== 1 ? this.$store.state.cart_length - 1 : '');
+                this.$store.state.cart_list.splice(this.$store.state.cart_list.indexOf(this.course), 1);
+                this.$message({
+                    message: '已删除!',
+                    type: "success"
+                });
+            }).catch(error => {
+                console.log(error);
+                if (error.response.data.detail === "Signature has expired.")
+                    this.$confirm("登录已过期，请重新登录，点击确认可前往登录！").then(() => {
+                        this.$store.commit('change_username', '');
+                        this.$store.commit('change_count', '');
+                        sessionStorage.clear();
+                        this.$router.push('/login');
+                    })
+                else
+                    this.$message({
+                        message: '删除失败!',
+                        type: "error"
+                    });
             })
         },
     }
@@ -123,5 +173,10 @@ export default {
     height: 116px;
     width: 142px;
     line-height: 116px;
+}
+
+.cart_item .column_4 span:hover {
+    cursor: default;
+    color: #ffc210;
 }
 </style>
