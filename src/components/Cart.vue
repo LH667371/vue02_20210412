@@ -130,6 +130,7 @@ export default {
         },
     },
     created() {
+        this.$store.commit('all_del_select', true);
         this.check_user_login();
         this.get_cart_list();
     },
