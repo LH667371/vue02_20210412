@@ -22,7 +22,7 @@
                         <li class="hot" @click="change_order_type('students')" :class="change_order_class('students')">
                             人气
                         </li>
-                        <li @click="change_order_type('price')" :class="change_order_class('price')">价格
+                        <li @click="change_order_type('real_price')" :class="change_order_class('real_price')">价格
                         </li>
                     </ul>
                     <p class="condition-result">共21个课程</p>
@@ -61,10 +61,11 @@
                             </ul>
                         </div>
                         <div class="pay-box">
-                            <span class="discount-type" v-show="course.course_type === 3">限时免费</span>
-                            <span class="discount-price" v-show="course.course_type === 3">￥0.00元</span>
-                            <span class="original-price" v-show="course.course_type === 3">原价：{{ course.price }}元</span>
-                            <span class="discount-price" v-show="course.course_type !== 3">￥{{ course.price }}元</span>
+                            <span class="discount-type" v-show="parseFloat(course.real_price)!==parseFloat(course.price)">{{ course.discount_name }}</span>
+                            <span class="discount-price"
+                                  v-show="parseFloat(course.real_price)!==parseFloat(course.price)">￥{{ parseFloat(course.real_price).toFixed(2) }}元</span>
+                            <span class="original-price" v-show="parseFloat(course.real_price)!==parseFloat(course.price)">原价：{{ parseFloat(course.price).toFixed(2) }}元</span>
+                            <span class="discount-price" v-show="parseFloat(course.real_price)===parseFloat(course.price)">￥{{ parseFloat(course.price).toFixed(2) }}元</span>
                             <span class="buy-now">立即购买</span>
                         </div>
                     </div>

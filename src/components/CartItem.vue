@@ -5,17 +5,15 @@
         </div>
         <div class="cart_column column_2">
             <img :src="this.$settings.HOST + course.image" alt="">
-            <span><router-link to="/course/detail/1">{{ course.name }}</router-link></span>
+            <span><router-link :to="'/detail/'+course.course_id">{{ course.name }}</router-link></span>
         </div>
         <div class="cart_column column_3">
             <el-select v-model="course.expire_id" size="mini" placeholder="请选择购买有效期" class="my_el_select">
-                <el-option label="1个月有效" :value="1" :key="1"></el-option>
-                <el-option label="2个月有效" :value="2" :key="2"></el-option>
-                <el-option label="3个月有效" :value="3" :key="3"></el-option>
-                <el-option label="永久有效" :value="0" :key="0"></el-option>
+                <el-option v-for="item in course.expire_list" :label="item.expire_text" :value="item.id"
+                           :key="item.id"></el-option>
             </el-select>
         </div>
-        <div class="cart_column column_4">¥{{ course.price }}</div>
+        <div class="cart_column column_4">¥{{ parseFloat(course.expire_price===null?course.price:course.expire_price).toFixed(2) }}</div>
         <div class="cart_column column_4">
             <el-popconfirm icon="el-icon-info"
                            icon-color="red"
@@ -35,7 +33,10 @@ export default {
         // 监听勾选状态是否发生了变化
         "$store.state.select_id"() {
             this.checked = this.$store.state.select_id.includes(this.course.course_id);
-        }
+        },
+        "course.expire_id"() {
+            this.change_course_expire();
+        },
     },
     data() {
         return {
@@ -72,6 +73,29 @@ export default {
                 console.log(error);
             })
         },
+        change_course_expire() {
+            this.$axios.patch(this.$settings.HOST + "cart/option/", {
+                course_id: this.course.course_id,
+                expire: this.course.expire_id,
+            }, {
+                headers: {
+                    "Authorization": "auth " + sessionStorage.token
+                }
+            }).then(res => {
+                // console.log(res);
+                this.course.expire_price = res.data.expire_price;
+                this.change_price();
+            }).catch(error => {
+                if (error.response.data.detail === "Signature has expired.")
+                    this.$confirm("登录已过期，请重新登录，点击确认可前往登录！").then(() => {
+                        this.$store.commit('change_username', '');
+                        this.$store.commit('change_count', '');
+                        sessionStorage.clear();
+                        this.$router.push('/login');
+                    })
+                console.log(error);
+            })
+        },
         del_course() {
             let course_id = [];
             course_id.push(this.course.course_id);
@@ -88,6 +112,7 @@ export default {
                 // console.log(res);
                 this.$store.commit('change_count', this.$store.state.cart_length !== 1 ? this.$store.state.cart_length - 1 : '');
                 this.$store.state.cart_list.splice(this.$store.state.cart_list.indexOf(this.course), 1);
+                this.$store.state.select_id.splice(this.$store.state.select_id.indexOf(this.course.course_id), 1);
                 this.$message({
                     message: '已删除!',
                     type: "success"
@@ -108,6 +133,9 @@ export default {
                     });
             })
         },
+        change_price () {
+            this.$emit("c_price");
+        }
     }
 }
 </script>

@@ -58,9 +58,23 @@ export default {
         if (sessionStorage.token) {
             this.login_status = true;
             this.username = sessionStorage.username;
+            this.get_cart_length();
         }
     },
     methods: {
+        get_cart_length() {
+            this.$axios.get(this.$settings.HOST + "cart/option/", {
+                headers: {
+                    // 由于此视图需要认证，所以需要携带token
+                    "Authorization": "auth " + sessionStorage.token,
+                },
+            }).then(res => {
+                // console.log(res.data);
+                this.$store.commit("change_count", res.data.length === 0 ? '' : res.data.length);
+            }).catch(error => {
+                console.log(error);
+            })
+        },
         to_cart() {
             if (!sessionStorage.token) {
                 this.$confirm("请登录后再查看购物车，点击确认可前往登录！").then(() => {

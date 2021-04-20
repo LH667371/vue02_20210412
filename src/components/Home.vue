@@ -17,25 +17,6 @@ export default {
         Footer: Footer,
         Banner: Banner,
     },
-    created() {
-        if (sessionStorage.token)
-            this.get_cart_length();
-    },
-    methods: {
-        get_cart_length() {
-            this.$axios.get(this.$settings.HOST + "cart/option/", {
-                headers: {
-                    // 由于此视图需要认证，所以需要携带token
-                    "Authorization": "auth " + sessionStorage.token,
-                },
-            }).then(res => {
-                console.log(res.data);
-                this.$store.commit("change_count", res.data.length === 0 ? '' : res.data.length);
-            }).catch(error => {
-                console.log(error);
-            })
-        },
-    }
 }
 </script>
 

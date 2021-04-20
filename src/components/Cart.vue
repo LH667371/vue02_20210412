@@ -15,7 +15,7 @@
                     <span class="do_more">操作</span>
                 </div>
                 <div class="cart_course_list" v-for="(course, index) in this.$store.state.cart_list" :key="index">
-                    <CartItem :course="course"></CartItem>
+                    <CartItem :course="course" @c_price="change_price"></CartItem>
                     <hr>
                 </div>
                 <div class="cart_footer_row">
@@ -34,7 +34,7 @@
                         </el-popconfirm>
                     </span>
                     <span class="goto_pay">去结算</span>
-                    <span class="cart_total">总计：¥0.0</span>
+                    <span class="cart_total">总计：¥{{ parseFloat(price).toFixed(2) }}</span>
                 </div>
             </div>
         </div>
@@ -60,16 +60,20 @@ export default {
         return {
             token: "",
             checked: false,
+            price: 0.00,
         }
     },
     watch: {
         "$store.state.select_id"() {
             this.checked = this.$store.state.select_id.length !== 0 ? this.$store.state.select_id.length === this.$store.state.cart_list.length : false;
-        }
+            this.change_price();
+        },
     },
     methods: {
         // 获取购物车的数据
         get_cart_list() {
+            this.$store.commit('give_cart_list', []);
+            this.$store.commit('all_del_select', true);
             this.$axios.get(this.$settings.HOST + "cart/option/", {
                 headers: {
                     "Authorization": "auth " + sessionStorage.token
@@ -186,10 +190,20 @@ export default {
                     type: "error"
                 });
         },
+        change_price() {
+            this.price = 0;
+            for (let i = 0; i < this.$store.state.cart_list.length; i++)
+                for (let j = 0; j < this.$store.state.select_id.length; j++) {
+                    if (this.$store.state.cart_list[i].course_id === this.$store.state.select_id[j]) {
+                        if (this.$store.state.cart_list[i].expire_price !== null)
+                            this.price += parseFloat(this.$store.state.cart_list[i].expire_price);
+                        else
+                            this.price += parseFloat(this.$store.state.cart_list[i].price);
+                    }
+                }
+        },
     },
     created() {
-        this.$store.commit('give_cart_list', []);
-        this.$store.commit('all_del_select', true);
         this.check_user_login();
         this.get_cart_list();
     },
@@ -198,10 +212,7 @@ export default {
 
 <style scoped>
 .footer {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 147px;
+
 }
 
 .cart_info {

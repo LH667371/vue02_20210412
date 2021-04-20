@@ -15,14 +15,15 @@
                     <h3 class="course-name">{{ course_info.name }}</h3>
                     <p class="data">{{ course_info.students }}人在学&nbsp;&nbsp;&nbsp;&nbsp;课程总时长：
                         {{ course_info.lessons }}课时/89小时&nbsp;&nbsp;&nbsp;&nbsp;难度：{{ course_info.level_n }}</p>
-                    <div class="sale-time" v-show="course_info.type === '限时免费'">
-                        <p class="sale-type">限时免费</p>
-                        <p class="expire">距离结束：仅剩 110天 13小时 33分 <span class="second">08</span>
-                            秒</p>
+                    <div class="sale-time" v-show="parseFloat(course_info.real_price)!==parseFloat(course_info.price)">
+                        <p class="sale-type">{{ course_info.discount_name }}</p>
+                        <p class="expire">距离结束：仅剩 {{ days }} 天 {{ (Array(2).join(0) + hours).slice(-2) }} 小时
+                            {{ (Array(2).join(0) + minutes).slice(-2) }} 分钟<span
+                                class="second">{{ (Array(2).join(0) + seconds).slice(-2) }}</span>秒</p>
                     </div>
-                    <p class="course-price" v-if="course_info.type === '限时免费'">
+                    <p class="course-price" v-if="parseFloat(course_info.real_price)!==parseFloat(course_info.price)">
                         <span>活动价</span>
-                        <span class="discount">¥0.00</span>
+                        <span class="discount">¥{{ course_info.real_price }}</span>
                         <span class="original">¥{{ course_info.price }}</span>
                     </p>
                     <p class="course-price" v-else>
@@ -174,6 +175,11 @@ export default {
         return {
             tabIndex: 2,
             course_info: {},
+            days: 0,
+            hours: 0,
+            minutes: 0,
+            seconds: 0,
+            time: 0,
             playerOptions: {
                 playbackRates: [0.5, 1.0, 1.5, 2.0], // 播放速度
                 autoplay: false, //如果true,则自动播放
@@ -208,6 +214,7 @@ export default {
                 }
             }).then(res => {
                 // console.log(res);
+                this.time = res.data[0].active_time;
                 this.playerOptions.sources[0].src = res.data[0].course_video;
                 if (!res.data[0].course_video)
                     this.playerOptions.notSupportedMessage = '无试看视频，请耐心等待，我们会竭尽所能为你争取！'
@@ -331,16 +338,27 @@ export default {
                 console.log(error);
             })
         },
-    }
+    },
+    mounted() {
+        this.timer = setInterval(() => {
+            this.days = parseInt(this.time / (60 * 60 * 24));
+            this.hours = parseInt((this.time % (60 * 60 * 24)) / (60 * 60));
+            this.minutes = parseInt((this.time % (60 * 60)) / 60);
+            this.seconds = this.time % 60;
+            this.time--;
+        }, 1000)
+    },
+    beforeDestroy() {
+        if (this.timer) {
+            clearInterval(this.timer); // 在Vue实例销毁前，清除我们的定时器
+        }
+    },
 }
 </script>
 
 <style scoped>
 .footer {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 147px;
+
 }
 
 .main {
