@@ -1,113 +1,112 @@
 <template>
-    <div>
+    <div class="main">
         <Header/>
-        <div class="main">
-            <div class="course-info">
-                <!-- 视频播放 -->
-                <div class="wrap-left">
-                    <videoPlayer class="video-player vjs-custom-skin"
-                                 ref="videoPlayer"
-                                 :options="playerOptions"
-                                 :playsinline="true">
-                    </videoPlayer>
+        <div class="course-info">
+            <!-- 视频播放 -->
+            <div class="wrap-left">
+                <videoPlayer class="video-player vjs-custom-skin"
+                             ref="videoPlayer"
+                             :options="playerOptions"
+                             :playsinline="true">
+                </videoPlayer>
+            </div>
+            <div class="wrap-right">
+                <h3 class="course-name">{{ course_info.name }}</h3>
+                <p class="data">{{ course_info.students }}人在学&nbsp;&nbsp;&nbsp;&nbsp;课程总时长：
+                    {{ course_info.lessons }}课时/89小时&nbsp;&nbsp;&nbsp;&nbsp;难度：{{ course_info.level_n }}</p>
+                <div class="sale-time" v-show="parseFloat(course_info.real_price)!==parseFloat(course_info.price)">
+                    <p class="sale-type">{{ course_info.discount_name }}</p>
+                    <p class="expire">距离结束：仅剩 {{ days }} 天 {{ (Array(2).join(0) + hours).slice(-2) }} 小时
+                        {{ (Array(2).join(0) + minutes).slice(-2) }} 分钟<span
+                            class="second">{{ (Array(2).join(0) + seconds).slice(-2) }}</span>秒</p>
                 </div>
-                <div class="wrap-right">
-                    <h3 class="course-name">{{ course_info.name }}</h3>
-                    <p class="data">{{ course_info.students }}人在学&nbsp;&nbsp;&nbsp;&nbsp;课程总时长：
-                        {{ course_info.lessons }}课时/89小时&nbsp;&nbsp;&nbsp;&nbsp;难度：{{ course_info.level_n }}</p>
-                    <div class="sale-time" v-show="parseFloat(course_info.real_price)!==parseFloat(course_info.price)">
-                        <p class="sale-type">{{ course_info.discount_name }}</p>
-                        <p class="expire">距离结束：仅剩 {{ days }} 天 {{ (Array(2).join(0) + hours).slice(-2) }} 小时
-                            {{ (Array(2).join(0) + minutes).slice(-2) }} 分钟<span
-                                class="second">{{ (Array(2).join(0) + seconds).slice(-2) }}</span>秒</p>
+                <p class="course-price" v-if="parseFloat(course_info.real_price)!==parseFloat(course_info.price)">
+                    <span>活动价</span>
+                    <span class="discount">¥{{ course_info.real_price }}</span>
+                    <span class="original">¥{{ course_info.price }}</span>
+                </p>
+                <p class="course-price" v-else>
+                    <span>价格</span>
+                    <span class="discount">¥{{ course_info.price }}</span>
+                </p>
+                <div class="buy">
+                    <div class="buy-btn">
+                        <button class="buy-now">立即购买</button>
+                        <button class="free">免费试学</button>
                     </div>
-                    <p class="course-price" v-if="parseFloat(course_info.real_price)!==parseFloat(course_info.price)">
-                        <span>活动价</span>
-                        <span class="discount">¥{{ course_info.real_price }}</span>
-                        <span class="original">¥{{ course_info.price }}</span>
-                    </p>
-                    <p class="course-price" v-else>
-                        <span>价格</span>
-                        <span class="discount">¥{{ course_info.price }}</span>
-                    </p>
-                    <div class="buy">
-                        <div class="buy-btn">
-                            <button class="buy-now">立即购买</button>
-                            <button class="free">免费试学</button>
-                        </div>
-                        <div class="add-cart" @click="add_cart">
-                            <!--                            <img src="" alt="">-->
-                            加入购物车
-                        </div>
+                    <div class="add-cart" @click="add_cart">
+                        <!--                            <img src="" alt="">-->
+                        加入购物车
                     </div>
                 </div>
             </div>
-            <div class="course-tab">
-                <ul class="tab-list">
-                    <li :class="tabIndex===1?'active':''" @click="tabIndex=1">
-                        详情介绍
-                    </li>
-                    <li :class="tabIndex===2?'active':''" @click="tabIndex=2">
-                        课程章节
-                        <span :class="tabIndex!==2?'free':''" v-show="course_info.type === '限时免费'">
+        </div>
+        <div class="course-tab">
+            <ul class="tab-list">
+                <li :class="tabIndex===1?'active':''" @click="tabIndex=1">
+                    详情介绍
+                </li>
+                <li :class="tabIndex===2?'active':''" @click="tabIndex=2">
+                    课程章节
+                    <span :class="tabIndex!==2?'free':''" v-show="course_info.type === '限时免费'">
                             (试学)
                         </span>
-                    </li>
-                    <li :class="tabIndex===3?'active':''" @click="tabIndex=3;get_comment">
-                        学生评论 ({{ comment.length }})
-                    </li>
-                    <li :class="tabIndex===4?'active':''" @click="tabIndex=4">常见问题</li>
-                </ul>
-            </div>
-            <div class="course-content">
-                <div class="course-tab-list">
-                    <div class="tab-item" v-if="tabIndex===1">
-                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ course_info.brief }}</p>
+                </li>
+                <li :class="tabIndex===3?'active':''" @click="tabIndex=3;get_comment">
+                    学生评论 ({{ comment.length }})
+                </li>
+                <li :class="tabIndex===4?'active':''" @click="tabIndex=4">常见问题</li>
+            </ul>
+        </div>
+        <div class="course-content">
+            <div class="course-tab-list">
+                <div class="tab-item" v-if="tabIndex===1">
+                    <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ course_info.brief }}</p>
+                </div>
+                <div class="tab-item" v-if="tabIndex===2">
+                    <div class="tab-item-title">
+                        <p class="chapter">课程章节</p>
+                        <p class="chapter-length">共<span
+                            v-if="course_info['lesson_info']">{{ course_info['lesson_info'].length }}</span>章
+                            {{ course_info.pub_lessons }}个课时
+                        </p>
                     </div>
-                    <div class="tab-item" v-if="tabIndex===2">
-                        <div class="tab-item-title">
-                            <p class="chapter">课程章节</p>
-                            <p class="chapter-length">共<span
-                                v-if="course_info['lesson_info']">{{ course_info['lesson_info'].length }}</span>章
-                                {{ course_info.pub_lessons }}个课时
-                            </p>
-                        </div>
-                        <div class="chapter-item" v-for="(value, index) in course_info.lesson_info" :key="index">
-                            <p class="chapter-title">
-                                <!--                                <img src="" alt="">-->
-                                第{{ value.chapter }}章 {{ value.chapter_name }}
-                            </p>
-                            <ul class="lesson-list" v-for="(value1, key) in value.lesson" :key="key">
-                                <li class="lesson-item">
-                                    <p class="name">
+                    <div class="chapter-item" v-for="(value, index) in course_info.lesson_info" :key="index">
+                        <p class="chapter-title">
+                            <!--                                <img src="" alt="">-->
+                            第{{ value.chapter }}章 {{ value.chapter_name }}
+                        </p>
+                        <ul class="lesson-list" v-for="(value1, key) in value.lesson" :key="key">
+                            <li class="lesson-item">
+                                <p class="name">
                                         <span class="index">
                                             {{ value.chapter }}-
                                             {{ value1.lesson_orders }}
                                     </span>
-                                        {{ value1.name }}
-                                        <span class="free"
-                                              v-show="value1.free_trail || course_info.type === '限时免费'">免费</span>
-                                    </p>
-                                    <p class="time">{{ value1.duration }}
-                                        <!--                                        <img src="" alt="">-->
-                                    </p>
-                                    <button class="try">立即试学</button>
-                                </li>
-                            </ul>
-                        </div>
+                                    {{ value1.name }}
+                                    <span class="free"
+                                          v-show="value1.free_trail || parseFloat(course_info.real_price) === 0">免费</span>
+                                </p>
+                                <p class="time">{{ value1.duration }}
+                                    <!--                                        <img src="" alt="">-->
+                                </p>
+                                <button class="try">立即试学</button>
+                            </li>
+                        </ul>
                     </div>
-                    <div class="tab-item" v-if="tabIndex===3">
-                        <div align="center" style="padding-top: 10px;padding-bottom: 10px">
-                            <el-input
-                                type="textarea"
-                                autosize
-                                placeholder="请输入内容"
-                                v-model="textarea"
-                                style="width: 750px">
-                            </el-input>
-                            <el-button size="small" @click="give_comment" round>发 送</el-button>
-                        </div>
-                        <span v-for="(value, index) in comment" :key="index">
+                </div>
+                <div class="tab-item" v-if="tabIndex===3">
+                    <div align="center" style="padding-top: 10px;padding-bottom: 10px">
+                        <el-input
+                            type="textarea"
+                            autosize
+                            placeholder="请输入内容"
+                            v-model="textarea"
+                            style="width: 750px">
+                        </el-input>
+                        <el-button size="small" @click="give_comment" round>发 送</el-button>
+                    </div>
+                    <span v-for="(value, index) in comment" :key="index">
                                 <span style="font-size: 14px;color: #888888;padding-left: 3%">
                                     {{ value.username }}
                                 </span>
@@ -129,32 +128,29 @@
                                 </span>
                                 <hr style="border:solid 1px #eeeeee;height:0;width: 95%">
                             </span>
-                    </div>
-
-                    <div class="tab-item" v-if="tabIndex===4">
-                        常见问题
-                    </div>
                 </div>
-                <div class="course-side">
-                    <div class="teacher-info">
-                        <h4 class="side-title"><span>授课老师</span></h4>
-                        <div class="teacher-content" v-if="course_info.teacher">
-                            <div class="cont1">
-                                <img :src="course_info.teacher.image" alt="">
-                                <div class="name">
-                                    <p class="teacher-name">{{ course_info.teacher.name }}</p>
-                                    <p class="teacher-title">{{ course_info.teacher.brief }}</p>
-                                </div>
+
+                <div class="tab-item" v-if="tabIndex===4">
+                    常见问题
+                </div>
+            </div>
+            <div class="course-side">
+                <div class="teacher-info">
+                    <h4 class="side-title"><span>授课老师</span></h4>
+                    <div class="teacher-content" v-if="course_info.teacher">
+                        <div class="cont1">
+                            <img :src="course_info.teacher.image" alt="">
+                            <div class="name">
+                                <p class="teacher-name">{{ course_info.teacher.name }}</p>
+                                <p class="teacher-title">{{ course_info.teacher.brief }}</p>
                             </div>
-                            <p class="narrative">{{ course_info.teacher.role_name }}，{{ course_info.teacher.title }}</p>
                         </div>
+                        <p class="narrative">{{ course_info.teacher.role_name }}，{{ course_info.teacher.title }}</p>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="footer">
-            <Footer/>
-        </div>
+        <Footer/>
     </div>
 </template>
 
@@ -331,7 +327,7 @@ export default {
                     "Authorization": "auth " + sessionStorage.token
                 },
             }).then(res => {
-                this.$message.success(res.data.message);
+                this.$message({message: res.data.message, type: 'success', duration: 800});
                 // 当添加购物车时，向状态机提交一个动作修改购物车数量
                 this.$store.commit("change_count", res.data.cart_length);
             }).catch(error => {
@@ -357,16 +353,16 @@ export default {
 </script>
 
 <style scoped>
-.footer {
-
-}
-
 .main {
     background: #fff;
     padding-top: 30px;
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
 }
 
 .course-info {
+    flex: 1;
     width: 1200px;
     margin: 0 auto;
     overflow: hidden;

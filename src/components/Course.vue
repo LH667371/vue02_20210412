@@ -32,40 +32,54 @@
             <!-- 课程列表 -->
             <div class="course-list" :style="{height: 290*filters.size+'px'}">
                 <div class="course-item" v-for="course in course_list" :key="course.id">
-                    <div class="course-image">
-                        <img :src="course.course_img" alt="">
-                    </div>
+                    <router-link :to="'/detail/'+course.id">
+                        <div class="course-image">
+                            <img :src="course.course_img" alt="">
+                        </div>
+                    </router-link>
                     <div class="course-info">
                         <h3>
                             <router-link :to="'/detail/'+course.id">{{ course.name }}</router-link>
                             <span>
-                                <img src="/static/image/avatar1.svg" alt="">{{ course.students }}人已加入学习
-                            </span>
+                                    <img src="/static/image/avatar1.svg" alt="">{{ course.students }}人已加入学习
+                                </span>
                         </h3>
                         <p class="teather-info">{{ course.teacher !== null ? course.teacher.name : '' }}
                             {{ course.teacher !== null ? course.teacher.title : '' }}
                             <span>
-                                {{ course.lessons === course.pub_lessons ? '更新完成' : `已更新${course.pub_lessons}课时` }}
-                                /共{{ course.lessons }}课时
-                            </span>
+                                    {{ course.lessons === course.pub_lessons ? '更新完成' : `已更新${course.pub_lessons}课时` }}
+                                    /共{{ course.lessons }}课时
+                                </span>
                         </p>
                         <div style="height: 114px">
                             <ul class="lesson-list">
                                 <li v-for="(lesson, index) in course.lesson_list" :key="index">
-                                <span class="lesson-title">
-                                    0{{ lesson.chapter }} | 第{{ lesson.orders }}节：
-                                    {{ lesson.name }}
-                                </span>
-                                    <span v-if="lesson.free_trail" class="free">免费</span>
+                                    <span class="lesson-title">
+                                        0{{ lesson.chapter }} | 第{{ lesson.orders }}节：
+                                        {{ lesson.name }}
+                                    </span>
+                                    <span v-if="lesson.free_trail ||parseFloat(course.real_price) ===0"
+                                          class="free">免费</span>
                                 </li>
                             </ul>
                         </div>
                         <div class="pay-box">
-                            <span class="discount-type" v-show="parseFloat(course.real_price)!==parseFloat(course.price)">{{ course.discount_name }}</span>
+                                <span class="discount-type"
+                                      v-show="parseFloat(course.real_price)!==parseFloat(course.price)">
+                                    {{ course.discount_name }}
+                                </span>
                             <span class="discount-price"
-                                  v-show="parseFloat(course.real_price)!==parseFloat(course.price)">￥{{ parseFloat(course.real_price).toFixed(2) }}元</span>
-                            <span class="original-price" v-show="parseFloat(course.real_price)!==parseFloat(course.price)">原价：{{ parseFloat(course.price).toFixed(2) }}元</span>
-                            <span class="discount-price" v-show="parseFloat(course.real_price)===parseFloat(course.price)">￥{{ parseFloat(course.price).toFixed(2) }}元</span>
+                                  v-show="parseFloat(course.real_price)!==parseFloat(course.price)">
+                                    ￥{{ parseFloat(course.real_price).toFixed(2) }}元
+                                </span>
+                            <span class="original-price"
+                                  v-show="parseFloat(course.real_price)!==parseFloat(course.price)">
+                                    原价：{{ parseFloat(course.price).toFixed(2) }}元
+                                </span>
+                            <span class="discount-price"
+                                  v-show="parseFloat(course.real_price)===parseFloat(course.price)">￥
+                                    {{ parseFloat(course.price).toFixed(2) }}元
+                                </span>
                             <span class="buy-now">立即购买</span>
                         </div>
                     </div>

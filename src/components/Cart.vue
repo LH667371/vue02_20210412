@@ -33,14 +33,12 @@
                             <span slot="reference"><i class="el-icon-delete"> 删除</i></span>
                         </el-popconfirm>
                     </span>
-                    <span class="goto_pay">去结算</span>
+                    <span class="goto_pay" @click="go_order">去结算</span>
                     <span class="cart_total">总计：¥{{ parseFloat(price).toFixed(2) }}</span>
                 </div>
             </div>
         </div>
-        <div class="footer">
-            <Footer></Footer>
-        </div>
+        <Footer></Footer>
     </div>
 </template>
 
@@ -202,6 +200,12 @@ export default {
                     }
                 }
         },
+        go_order() {
+            if (this.$store.state.cart_list.length !== 0)
+                this.$router.push("/order");
+            else
+                this.$message.error('没有加购商品，无法进行结算！');
+        }
     },
     created() {
         this.check_user_login();
@@ -211,13 +215,17 @@ export default {
 </script>
 
 <style scoped>
-.footer {
-
+.cart {
+    /*margin-top: 80px;*/
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
 }
 
 .cart_info {
+    flex: 1;
     width: 1200px;
-    margin: 0 auto 200px;
+    margin: 0 auto 10px;
 }
 
 .cart_title {
