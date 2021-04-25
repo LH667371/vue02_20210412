@@ -61,19 +61,6 @@ export default {
                         message: '手机号为空，请输入！',
                         type: 'error',
                     });
-            } else if (!/^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?!([^(0-9a-zA-Z)])+$).{6,20}$/.test(this.password)) {
-                if (this.password)
-                    this.$message({
-                        showClose: true,
-                        message: '密码格式有误，请重新输入！',
-                        type: 'error',
-                    });
-                else
-                    this.$message({
-                        showClose: true,
-                        message: '密码为空，请输入！',
-                        type: 'error',
-                    });
             } else
                 // 发送请求，获取验证码
                 this.$axios({
@@ -94,13 +81,14 @@ export default {
                             this.$router.push('/login');
                         }).catch(() => {
                         });
-                    else
+                    else {
                         this.$message({
                             showClose: true,
                             message: res.data.message,
                             type: 'success',
                         });
-                    this.countdown();
+                        this.countdown();
+                    }
                 }).catch(error => {
                     // console.log(error.response.data.message);
                     this.$message({

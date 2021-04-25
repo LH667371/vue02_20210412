@@ -31,10 +31,10 @@
                 </p>
                 <div class="buy">
                     <div class="buy-btn">
-                        <button class="buy-now">立即购买</button>
-                        <button class="free">免费试学</button>
+                        <button class="buy-now" v-if="parseFloat(course_info.real_price) !== 0">立即购买</button>
+                        <button class="free" v-if="parseFloat(course_info.real_price) !== 0">免费试学</button>
                     </div>
-                    <div class="add-cart" @click="add_cart">
+                    <div class="add-cart" @click="add_cart" v-if="parseFloat(course_info.real_price) !== 0">
                         <!--                            <img src="" alt="">-->
                         加入购物车
                     </div>
@@ -90,7 +90,8 @@
                                 <p class="time">{{ value1.duration }}
                                     <!--                                        <img src="" alt="">-->
                                 </p>
-                                <button class="try">立即试学</button>
+                                <button class="try" v-if="parseFloat(course_info.real_price) === 0">立即学习</button>
+                                <button class="try" v-else>立即试学</button>
                             </li>
                         </ul>
                     </div>

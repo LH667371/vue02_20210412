@@ -61,6 +61,10 @@ export default {
             price: 0.00,
         }
     },
+    created() {
+        this.check_user_login();
+        this.get_cart_list();
+    },
     watch: {
         "$store.state.select_id"() {
             this.checked = this.$store.state.select_id.length !== 0 ? this.$store.state.select_id.length === this.$store.state.cart_list.length : false;
@@ -206,10 +210,6 @@ export default {
             else
                 this.$message.error('没有加购商品，无法进行结算！');
         }
-    },
-    created() {
-        this.check_user_login();
-        this.get_cart_list();
     },
 }
 </script>

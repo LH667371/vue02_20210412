@@ -80,7 +80,10 @@
                                   v-show="parseFloat(course.real_price)===parseFloat(course.price)">￥
                                     {{ parseFloat(course.price).toFixed(2) }}元
                                 </span>
-                            <span class="buy-now">立即购买</span>
+                            <span class="buy-now" v-if="parseFloat(course.real_price) !==0">立即购买</span>
+                            <router-link :to="'/detail/'+course.id">
+                                <span class="buy-now" v-if="parseFloat(course.real_price) ===0">立即学习</span>
+                            </router-link>
                         </div>
                     </div>
                 </div>

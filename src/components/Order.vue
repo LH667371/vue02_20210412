@@ -100,9 +100,25 @@ export default {
                     console.log(res.data);
                     this.$message.success("订单生成成功，即将跳转到支付页面~");
                     this.get_cart_length();
-                    // 调用方法，开始支付
+                    // 在订单创建成功后 向后端发起生成支付的链接
+                    this.$axios.get(this.$settings.HOST + "payments/pay/", {
+                        params: {
+                            order_number: res.data.order_number
+                        },
+                        headers: {
+                            "Authorization": "auth " + sessionStorage.token,
+                        }
+                    }).then(res => {
+                        // 成功则返回一个支付链接
+                        location.href = res.data;
+                    }).catch(error => {
+                        // 链接生成失败
+                        console.log(error);
+                    })
                 }).catch(error => {
-                    console.log(error);
+                    // console.log(error);
+                    if (error.response.status === 402)
+                        this.$message.error(error.response.data.message)
                     try {
                         if (error.response.data.detail === "Signature has expired.")
                             this.$confirm("登录已过期，请重新登录，点击确认可前往登录！").then(() => {

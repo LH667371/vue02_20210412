@@ -30,7 +30,7 @@
                         欢迎
                         <el-link type="primary">{{ username }}</el-link>
                         登录！
-                        <span>我的订单</span>
+                        <router-link to="/order_list"><span>我的订单</span></router-link>
                         &nbsp;|&nbsp;
                         <el-popconfirm title="确定退出登录吗？" @confirm="log_off">
                             <span slot="reference">退出登录</span>
@@ -168,7 +168,7 @@ export default {
 }
 
 .header .nav li:hover span {
-    color: #000;
+    color: #ffc210;
 }
 
 .header .login-bar {
@@ -212,7 +212,7 @@ export default {
 }
 
 .header .login-bar .login-box span:hover {
-    color: #000000;
+    color: #ffc210;
 }
 
 a {
