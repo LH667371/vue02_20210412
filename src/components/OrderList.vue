@@ -38,9 +38,9 @@
                             <img :src="$settings.HOST+'/media/'+value.course_img" alt="">
                             <div class="order-info-title">
                                 <p class="course-title">{{ value.name }}</p>
-                                <p class="price-service" v-show="value.discount_name">{{
-                                        value.discount_name
-                                    }}</p>
+                                <p class="price-service" v-show="value.discount_name">
+                                    {{ value.discount_name }}
+                                </p>
                             </div>
                         </li>
                         <li class="course-expire">{{ value.expire }}</li>
@@ -49,10 +49,12 @@
                         <li class="order-status" v-if="order.status === '已支付'">交易成功</li>
                         <li class="order-status" v-else>{{ order.status }}</li>
                         <li class="order-do">
-                            <span class="btn" v-if="order.status === '已支付'">去学习</span>
+                            <router-link :to="'/detail/'+value.id"><span class="btn"
+                                                                         v-if="order.status === '已支付'">去学习</span>
+                            </router-link>
                             <span class="btn2" v-if="order.status === '未支付'"
                                   v-show="index === order.order_detail.length-1"
-                                  @click="go_pay(order.order_number)">去支付</span>
+                                  @click="go_pay(order.order_number, key)">去支付</span>
                             <el-popconfirm title="确定取消该订单吗？" @confirm="cancel(order.id, key)">
                                 <span class="btn3" v-if="order.status === '未支付'"
                                       v-show="index === order.order_detail.length-1"
@@ -125,7 +127,7 @@ export default {
         show_time(val) {
             return formatDate({date: val, formatStr: 'yyyy-MM-dd HH:mm:ss'})
         },
-        go_pay(order_number) {
+        go_pay(order_number, index) {
             this.$axios.get(this.$settings.HOST + "payments/pay/", {
                 params: {
                     order_number: order_number
@@ -139,8 +141,11 @@ export default {
             }).catch(error => {
                 // 链接生成失败
                 // console.log(error.response);
-                if (error.response.status === 402)
+                if (error.response.status === 402) {
                     this.$message.error(error.response.data.message)
+                    if　(error.response.data.message === "对不起，您支付的订单已经超时！")
+                        this.order_list[index].status = "超时取消";
+                }
                 try {
                     if (error.response.data.detail === "Signature has expired.")
                         this.$confirm("登录已过期，请重新登录，点击确认可前往登录！").then(() => {
