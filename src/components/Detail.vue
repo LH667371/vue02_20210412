@@ -202,6 +202,7 @@ export default {
         // console.log(this.$route.params.id);
         this.get_course_info();
         this.get_comment();
+        this.$store.commit('change_username', sessionStorage.username);
     },
     methods: {
         get_course_info() {
